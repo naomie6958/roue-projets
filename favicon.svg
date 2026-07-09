@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="5" fill="#0d0d0d"/>
+  <!-- 7 segments colorés (égaux) sur un anneau r=11 centré à 16,16 -->
+  <path d="M 16 5 A 11 11 0 0 1 24.6 9.14"   stroke="#FF0090" stroke-width="3.5" fill="none"/>
+  <path d="M 24.6 9.14 A 11 11 0 0 1 26.72 18.45" stroke="#FF6B00" stroke-width="3.5" fill="none"/>
+  <path d="M 26.72 18.45 A 11 11 0 0 1 20.77 25.91" stroke="#00CED1" stroke-width="3.5" fill="none"/>
+  <path d="M 20.77 25.91 A 11 11 0 0 1 11.23 25.91" stroke="#00FF88" stroke-width="3.5" fill="none"/>
+  <path d="M 11.23 25.91 A 11 11 0 0 1 5.28 18.45"  stroke="#FFE500" stroke-width="3.5" fill="none"/>
+  <path d="M 5.28 18.45 A 11 11 0 0 1 7.4 9.14"    stroke="#9D00FF" stroke-width="3.5" fill="none"/>
+  <path d="M 7.4 9.14 A 11 11 0 0 1 16 5"          stroke="#00B4FF" stroke-width="3.5" fill="none"/>
+  <!-- Pointeur gold en haut -->
+  <polygon points="13,1 19,1 16,4.5" fill="#FFD700"/>
+</svg>

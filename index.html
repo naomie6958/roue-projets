@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roue de Projets — TNTMom</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+</head>
+<body>
+
+    <header>
+        <h1>ROUE DE PROJETS</h1>
+        <p class="subtitle">TNTMom · Rotation focus</p>
+    </header>
+
+    <main>
+
+        <!-- ROUE -->
+        <section class="wheel-section">
+            <canvas id="roue" width="600" height="600"></canvas>
+        </section>
+
+        <!-- SÉLECTEUR DE PROJET -->
+        <section class="selector-section">
+            <p class="selector-label">Durée de session</p>
+            <div class="timer-controls">
+                <button class="btn-timer" data-minutes="30">30min</button>
+                <button class="btn-timer" data-minutes="45">45min</button>
+                <button class="btn-timer" data-minutes="60">1h</button>
+                <button class="btn-timer active" data-minutes="90">1h30</button>
+                <button class="btn-timer" data-minutes="120">2h</button>
+                <button class="btn-timer" data-minutes="150">2h30</button>
+                <button class="btn-timer" data-minutes="180">3h</button>
+            </div>
+            <button id="btnSpin" class="btn-spin">🎲 Spin !</button>
+            <p class="selector-label" style="margin-top: 1.25rem;">Choisir un projet</p>
+            <div id="projectBtns" class="project-btns"></div>
+        </section>
+
+        <!-- TIMER -->
+        <section class="timer-section" id="timerSection" style="display: none;">
+            <div class="timer-actions">
+                <button id="btnPause"    class="btn-pause">⏸ Pause</button>
+                <button id="btnStopTimer" class="btn-stop">⏹ Arrêter</button>
+            </div>
+        </section>
+
+        <!-- PANNEAU FIN DE SESSION -->
+        <section id="sessionEndPanel" class="session-end-panel" style="display: none;">
+            <p class="session-end-msg">⏰ Session terminée !</p>
+            <textarea id="sessionNote" class="session-note-input" placeholder="Qu'est-ce que t'as accompli ?"></textarea>
+            <button id="btnCopyNote" class="btn-copy-note">📋 Copier pour SUIVI-PROJETS</button>
+            <div class="session-end-btns">
+                <button id="btnContinue" class="btn-continue">Continuer</button>
+                <button id="btnSwitch"   class="btn-switch">Switcher</button>
+            </div>
+        </section>
+
+
+        <!-- HISTORIQUE -->
+        <section class="history-section">
+            <div class="stats-header">
+                <h2>Sessions par projet</h2>
+                <button id="btnStatsToggle" class="stats-toggle-btn">📊 All time</button>
+            </div>
+            <div id="statsGrid" class="stats-grid"></div>
+        </section>
+
+        <!-- GESTION DES PROJETS -->
+        <section class="project-manager">
+            <button id="btnManageProjects">⚙️ Gérer les projets</button>
+
+            <div id="managePanel" style="display: none;">
+                <div id="projectsList"></div>
+
+                <form id="projectForm">
+                    <input  type="text"   id="inputLabel"   placeholder="Nom du projet" required>
+                    <input  type="color"  id="inputCouleur" value="#ff0090">
+                    <input  type="number" id="inputPoids"   placeholder="Poids" min="1" required>
+                    <button type="submit">Ajouter le projet</button>
+                </form>
+            </div>
+        </section>
+
+
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script src="js/wheel.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/app.js"></script>
+    
+</body>
+</html>
