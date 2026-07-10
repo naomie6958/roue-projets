@@ -70,22 +70,30 @@ function onSessionEnd(index) {
     drawWheel(0, seg.couleur);
 }
 
+function renderOvertime(index) {
+    const m = Math.floor(overtimeSeconds / 60);
+    const s = overtimeSeconds % 60;
+    const affichage = '+' + m + ':' + String(s).padStart(2, '0');
+    drawWheel(0, SEGMENTS[index].couleur, affichage);
+    document.title = '⏱ ' + affichage + ' · Roue de Projets';
+}
+
+function overtimeTick(index) {
+    overtimeSeconds++;
+    renderOvertime(index);
+}
+
 function startOvertime(index) {
     isOvertime      = true;
     overtimeSeconds = 0;
     document.getElementById('sessionEndPanel').style.display = 'none';
     timerSection.style.display = 'block';
     btnPause.style.display = 'none';
-    drawWheel(0, SEGMENTS[index].couleur, '+0:00');
-    document.title = '⏱ +0:00 · Roue de Projets';
+    saveTimerState(index, null, Date.now(), null, true);
+    renderOvertime(index);
 
     overtimeInterval = setInterval(function() {
-        overtimeSeconds++;
-        const m = Math.floor(overtimeSeconds / 60);
-        const s = overtimeSeconds % 60;
-        const affichage = '+' + m + ':' + String(s).padStart(2, '0');
-        drawWheel(0, SEGMENTS[index].couleur, affichage);
-        document.title = '⏱ ' + affichage + ' · Roue de Projets';
+        overtimeTick(index);
     }, 1000);
 }
 
@@ -116,6 +124,7 @@ function resumeTimer() {
 function stopTimer() {
     document.title = 'Roue de Projets — TNTMom';
     if (isOvertime){
+        clearTimerState();
         clearInterval(overtimeInterval);
         overtimeInterval = null;
         const overtimeMins = Math.round(overtimeSeconds / 60);
@@ -149,6 +158,26 @@ function stopTimer() {
 function restoreTimer() {
     const state = loadTimerState();
     if (!state) return;
+
+    if (state.overtime) {
+        currentIndex    = state.index;
+        activeIndex     = state.index;
+        isOvertime      = true;
+        overtimeSeconds = Math.floor((Date.now() - state.startTimestamp) / 1000);
+
+        document.querySelector('.selector-section').style.display = 'none';
+        document.getElementById('sessionEndPanel').style.display = 'none';
+        timerSection.style.display = 'block';
+        btnPause.style.display = 'none';
+
+        spinToSegment(state.index, null, function() {
+            renderOvertime(state.index);
+            overtimeInterval = setInterval(function() {
+                overtimeTick(state.index);
+            }, 1000);
+        });
+        return;
+    }
 
     const elapsed   = Math.floor((Date.now() - state.startTimestamp) / 1000);
     const remaining = state.totalSeconds - elapsed;
@@ -185,23 +214,30 @@ function restoreTimer() {
     });
 }
 
-document.querySelectorAll('.btn-timer').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        chosenMinutes = parseInt(btn.dataset.minutes);
-        localStorage.setItem('tntmom-duree', chosenMinutes);
-        document.querySelectorAll('.btn-timer').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    });
+function formatDuree(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h === 0) return m + 'min';
+    if (m === 0) return h + 'h';
+    return h + 'h' + String(m).padStart(2, '0');
+}
+
+const inputDuree = document.getElementById('inputDuree');
+const dureeLabel = document.getElementById('dureeLabel');
+
+inputDuree.addEventListener('input', function() {
+    chosenMinutes = parseInt(inputDuree.value);
+    dureeLabel.textContent = formatDuree(chosenMinutes);
+    localStorage.setItem('tntmom-duree', chosenMinutes);
 });
 
 // Restaure la dernière durée choisie
 const savedDuree = localStorage.getItem('tntmom-duree');
 if (savedDuree) {
     chosenMinutes = parseInt(savedDuree);
-    document.querySelectorAll('.btn-timer').forEach(function(btn) {
-        btn.classList.toggle('active', parseInt(btn.dataset.minutes) === chosenMinutes);
-    });
 }
+inputDuree.value = chosenMinutes;
+dureeLabel.textContent = formatDuree(chosenMinutes);
 
 btnPause.addEventListener('click', function() {
     isPaused ? resumeTimer() : pauseTimer();

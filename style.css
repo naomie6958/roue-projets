@@ -95,28 +95,48 @@ canvas:hover { filter: brightness(1.05); }
   margin-bottom: 1rem;
 }
 
-.timer-controls {
+.duree-manuelle {
   display: flex;
+  align-items: center;
   gap: 1rem;
   justify-content: center;
   margin-bottom: 1rem;
 }
 
-.btn-timer {
-  padding: 0.4rem 1.2rem;
-  background: transparent;
-  color: #666;
-  border: 1px solid #333;
-  border-radius: 100px;
+#inputDuree {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 260px;
+  height: 4px;
+  border-radius: 2px;
+  background: #333;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
+}
+#inputDuree::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FF0090;
+  box-shadow: 0 0 10px rgba(255,0,144,0.5);
+  cursor: pointer;
+}
+#inputDuree::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #FF0090;
+  box-shadow: 0 0 10px rgba(255,0,144,0.5);
+  cursor: pointer;
 }
 
-.btn-timer.active {
+#dureeLabel {
+  min-width: 3.5rem;
   color: white;
-  border-color: #FF0090;
-  box-shadow: 0 0 10px rgba(255,0,144,0.3);
+  font-weight: bold;
+  font-size: 0.9rem;
 }
 
 .timer-actions {
@@ -150,14 +170,29 @@ canvas:hover { filter: brightness(1.05); }
 
 .btn-stop:hover { color: white; border-color: #666; }
 
-/* STATS */
-.history-section {
+/* STATS + GESTION DES PROJETS, côte à côte */
+.stats-manager-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  align-items: flex-start;
+  justify-content: center;
   margin-top: 2rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 1500px;
 }
 
-.history-section h2 {
+.history-section {
+  flex: 1 1 550px;
+  max-width: 620px;
+  background: #131313;
+  border: 1px solid #242424;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.history-section h2,
+.project-manager h2 {
   font-size: 0.8rem;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -209,7 +244,7 @@ canvas:hover { filter: brightness(1.05); }
   margin-top: 1.5rem;
   text-align: center;
   width: 100%;
-  max-width: 500px;
+  max-width: 1500px;
 }
 
 .selector-label {
@@ -348,4 +383,112 @@ canvas:hover { filter: brightness(1.05); }
     transition: all 0.2s;
 }
 .btn-copy-note:hover { border-color: #888; color: #fff; }
+
+/* --- Gestion des projets (panel) --- */
+.project-manager {
+  flex: 1 1 320px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #131313;
+  border: 1px solid #242424;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+#managePanel {
+  width: 100%;
+}
+
+#projectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.project-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  background: #151515;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.project-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.project-row-label {
+  flex: 1;
+}
+.project-row-poids {
+  color: #888;
+  font-size: 0.78rem;
+}
+.btn-edit-project,
+.btn-delete-project {
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+}
+.btn-edit-project:hover { border-color: #FF0090; }
+.btn-delete-project:hover { border-color: #e5484d; }
+
+#projectForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+input[type="color"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
+input[type="color"]::-webkit-color-swatch { border: 2px solid #444; border-radius: 8px; transition: border-color 0.2s; }
+input[type="color"]::-moz-color-swatch { border: 2px solid #444; border-radius: 8px; transition: border-color 0.2s; }
+input[type="color"]:hover::-webkit-color-swatch { border-color: #FF0090; }
+input[type="color"]:hover::-moz-color-swatch { border-color: #FF0090; }
+#projectForm input[type="text"],
+#projectForm input[type="number"] {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+#projectForm button {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 1px solid #444;
+  color: #ddd;
+  border-radius: 20px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+#projectForm button:hover { border-color: #FF0090; color: #fff; }
+
 .btn-copy-note.copied { border-color: #4caf50; color: #4caf50; }

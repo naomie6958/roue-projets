@@ -30,12 +30,74 @@ function renderProjectsList() {
     const container = document.getElementById('projectsList');
     container.innerHTML = '';
 
-    SEGMENTS.forEach(function(seg, i) {
+    SEGMENTS.forEach(function(seg) {
         const div = document.createElement('div');
-        div.textContent = seg.label;
+        div.className = 'project-row';
+        div.innerHTML = `
+            <span class="project-swatch" style="background:${seg.couleur}"></span>
+            <span class="project-row-label">${seg.label}</span>
+            <span class="project-row-poids">poids ${seg.poids}</span>
+            <button type="button" class="btn-edit-project" data-id="${seg.id}">✏️</button>
+            <button type="button" class="btn-delete-project" data-id="${seg.id}">🗑️</button>
+        `;
         container.appendChild(div);
     });
 }
+
+let editingProjectId = null;
+
+function resetProjectForm() {
+    editingProjectId = null;
+    document.getElementById('projectForm').reset();
+    document.getElementById('btnSubmitProject').textContent = 'Ajouter le projet';
+    document.getElementById('btnCancelEdit').style.display = 'none';
+}
+
+document.getElementById('projectsList').addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.btn-edit-project');
+    const delBtn  = e.target.closest('.btn-delete-project');
+
+    if (editBtn) {
+        const projet = SEGMENTS.find(s => s.id === editBtn.dataset.id);
+        if (!projet) return;
+        editingProjectId = projet.id;
+        document.getElementById('inputLabel').value   = projet.label;
+        document.getElementById('inputCouleur').value = projet.couleur;
+        document.getElementById('inputPoids').value   = projet.poids;
+        document.getElementById('btnSubmitProject').textContent = 'Enregistrer les modifications';
+        document.getElementById('btnCancelEdit').style.display = 'inline-block';
+    }
+
+    if (delBtn) {
+        const projet = SEGMENTS.find(s => s.id === delBtn.dataset.id);
+        if (!projet) return;
+        if (!confirm(`Supprimer "${projet.label}" ? Toutes ses stats seront perdues.`)) return;
+        deleteProject(projet.id);
+        if (editingProjectId === projet.id) resetProjectForm();
+        refreshSegments();
+        renderProjectsList();
+    }
+});
+
+document.getElementById('btnCancelEdit').addEventListener('click', resetProjectForm);
+
+document.getElementById('projectForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const label   = document.getElementById('inputLabel').value.trim();
+    const couleur = document.getElementById('inputCouleur').value;
+    const poids   = parseInt(document.getElementById('inputPoids').value);
+    if (!label || !poids) return;
+
+    if (editingProjectId) {
+        updateProject(editingProjectId, { label, couleur, poids });
+    } else {
+        addProject({ id: 'p-' + Date.now(), label, couleur, poids });
+    }
+
+    resetProjectForm();
+    refreshSegments();
+    renderProjectsList();
+});
 
 function pickWeightedRandom() {
     const data = loadData();
@@ -158,12 +220,6 @@ document.getElementById('btnCopyNote').addEventListener('click', function() {
             btn.classList.remove('copied');
         }, 2000);
     });
-});
-
-// Gestionnaire de projets
-document.getElementById('btnManageProjects').addEventListener('click', function() {
-    const panel = document.getElementById('managePanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 });
 
 // Init

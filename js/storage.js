@@ -139,9 +139,9 @@ function getSessions() {
     return loadData().sessions;
 }
 
-function saveTimerState(index, chosenMinutes, startTimestamp, totalSeconds) {
+function saveTimerState(index, chosenMinutes, startTimestamp, totalSeconds, overtime = false) {
     localStorage.setItem('tntmom-timer', JSON.stringify({
-        index, chosenMinutes, startTimestamp, totalSeconds
+        index, chosenMinutes, startTimestamp, totalSeconds, overtime
     }));
 }
 

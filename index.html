@@ -24,14 +24,9 @@
         <!-- SÉLECTEUR DE PROJET -->
         <section class="selector-section">
             <p class="selector-label">Durée de session</p>
-            <div class="timer-controls">
-                <button class="btn-timer" data-minutes="30">30min</button>
-                <button class="btn-timer" data-minutes="45">45min</button>
-                <button class="btn-timer" data-minutes="60">1h</button>
-                <button class="btn-timer active" data-minutes="90">1h30</button>
-                <button class="btn-timer" data-minutes="120">2h</button>
-                <button class="btn-timer" data-minutes="150">2h30</button>
-                <button class="btn-timer" data-minutes="180">3h</button>
+            <div class="duree-manuelle">
+                <input type="range" id="inputDuree" min="15" max="240" step="5" value="90">
+                <span id="dureeLabel">1h30</span>
             </div>
             <button id="btnSpin" class="btn-spin">🎲 Spin !</button>
             <p class="selector-label" style="margin-top: 1.25rem;">Choisir un projet</p>
@@ -58,30 +53,33 @@
         </section>
 
 
-        <!-- HISTORIQUE -->
-        <section class="history-section">
-            <div class="stats-header">
-                <h2>Sessions par projet</h2>
-                <button id="btnStatsToggle" class="stats-toggle-btn">📊 All time</button>
-            </div>
-            <div id="statsGrid" class="stats-grid"></div>
-        </section>
+        <!-- HISTORIQUE + GESTION DES PROJETS, côte à côte -->
+        <div class="stats-manager-row">
+            <section class="history-section">
+                <div class="stats-header">
+                    <h2>Sessions par projet</h2>
+                    <button id="btnStatsToggle" class="stats-toggle-btn">📊 All time</button>
+                </div>
+                <div id="statsGrid" class="stats-grid"></div>
+            </section>
 
-        <!-- GESTION DES PROJETS -->
-        <section class="project-manager">
-            <button id="btnManageProjects">⚙️ Gérer les projets</button>
+            <!-- GESTION DES PROJETS -->
+            <section class="project-manager">
+                <h2>⚙️ Gérer les projets</h2>
 
-            <div id="managePanel" style="display: none;">
-                <div id="projectsList"></div>
+                <div id="managePanel">
+                    <div id="projectsList"></div>
 
-                <form id="projectForm">
-                    <input  type="text"   id="inputLabel"   placeholder="Nom du projet" required>
-                    <input  type="color"  id="inputCouleur" value="#ff0090">
-                    <input  type="number" id="inputPoids"   placeholder="Poids" min="1" required>
-                    <button type="submit">Ajouter le projet</button>
-                </form>
-            </div>
-        </section>
+                    <form id="projectForm">
+                        <input  type="text"   id="inputLabel"   placeholder="Nom du projet" required>
+                        <input  type="color"  id="inputCouleur" value="#ff0090">
+                        <input  type="number" id="inputPoids"   placeholder="Poids" min="1" required>
+                        <button type="submit" id="btnSubmitProject">Ajouter le projet</button>
+                        <button type="button" id="btnCancelEdit" style="display:none;">Annuler</button>
+                    </form>
+                </div>
+            </section>
+        </div>
 
 
     </main>

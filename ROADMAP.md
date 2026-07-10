@@ -1,7 +1,7 @@
 # ROADMAP — Roue de Projets
 
-## État actuel — V2.1 (2026-07-01)
-Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh · Stats semaine / all time · Spin pondéré · Continuer/Switcher · Célébration fin de session · Note de session copiable · Segments dynamiques (proportionnels aux weekMinutes) · Filtre segments 0 min · Croissance temps réel du segment actif
+## État actuel — V2.2 (2026-07-10)
+Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh (session normale + overtime) · Stats semaine / all time · Spin pondéré · Continuer/Switcher · Célébration fin de session · Note de session copiable · Segments dynamiques (proportionnels aux weekMinutes) · Filtre segments 0 min · Croissance temps réel du segment actif · **CRUD projets complet via UI** (ajouter/modifier/supprimer, panel stylisé)
 
 ---
 
@@ -14,8 +14,9 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh · Stat
 - [x] **Session perdue si timer expire pendant un refresh**
   - Fix : `restoreTimer()` appelle `onSessionEnd(state.index)` quand `remaining <= 0`
 
-- [ ] **Overtime timer ne survit pas à un refresh** (signalé 2026-07-06)
-  - À investiguer : `restoreTimer()` restaure le timer de session normal, mais pas l'état overtime (`startOvertime` dans `timer.js`) — probablement pas sauvegardé dans `saveTimerState`/`loadTimerState`
+- [x] **Overtime timer ne survit pas à un refresh** (signalé 2026-07-06, corrigé 2026-07-10)
+  - Cause confirmée : `startOvertime()` ne sauvegardait jamais rien dans `localStorage` — `restoreTimer()` n'avait donc rien à restaurer.
+  - Fix : `saveTimerState()` accepte un 5e paramètre `overtime` (défaut `false`). `startOvertime()` sauvegarde `{index, startTimestamp, overtime: true}`. `restoreTimer()` détecte `state.overtime` et recalcule `overtimeSeconds` depuis `startTimestamp` avant de relancer l'intervalle (logique d'affichage extraite dans `renderOvertime()`/`overtimeTick()`, réutilisées par `startOvertime()` et la restauration — même pattern que le refactor `tick()` du 2026-07-06). `stopTimer()` appelle maintenant `clearTimerState()` aussi en mode overtime (oublié avant, sinon un vieil état overtime traînerait après un stop normal).
 
 - [x] **Tableau de stats désaligné avec labels de longueur variable** (signalé 2026-07-06, corrigé 2026-07-06)
   - Cause : chaque `.stat-card` définissait ses propres colonnes (`grid-template-columns` en local) — pas de règle partagée entre les cartes, donc une carte avec un label plus long s'étirait sans que les autres suivent
@@ -43,19 +44,15 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh · Stat
 
 ## À faire
 
-- [ ] **CRUD projets via UI** 🔄 en cours (2026-07-02) — Lab 03/04
+- [x] **CRUD projets via UI** ✅ complété 2026-07-10 — Lab 01-04
   - [x] Lab 01 — `id` stable ajouté à chaque projet dans `SEGMENTS`
   - [x] Lab 02 — Projets migrés vers localStorage (`PROJECTS_KEY` + `DEFAULT_PROJECTS`, `loadProjects()`/`saveProjects()` dans `storage.js`), `wheel.js` lit `let SEGMENTS = loadProjects()`
   - [x] Bonus — Roue agrandie (canvas 500→600, `RAYON` 210→250) pour laisser de la place aux labels plus longs
   - [x] Lab 03 — Fonctions `addProject` / `deleteProject` / `updateProject` dans `storage.js` (2026-07-05) — synchronisées par index avec les tableaux de stats, garde `if (i === -1) return` sur `deleteProject`
-  - [x] `refreshSegments()` dans `wheel.js` (2026-07-06) — recharge `SEGMENTS` depuis localStorage + redessine roue/boutons/stats/liste (nécessaire car `SEGMENTS` n'était chargé qu'une fois au démarrage)
-  - [x] Panel HTML (2026-07-06) — bouton toggle `#btnManageProjects`, `#managePanel` caché par défaut, `#projectsList` + formulaire `#projectForm` (label, couleur, poids)
-  - [x] `renderProjectsList()` dans `app.js` (2026-07-06) — affiche les labels des projets dans le panel (texte brut, pas encore stylé)
-  - [ ] Lab 04 suite — boutons ✏️ Modifier / 🗑️ Supprimer par projet dans la liste (avec `data-id`) ← **prochaine étape**
-  - [ ] Brancher le formulaire d'ajout (`#projectForm` submit → `addProject()` + `refreshSegments()`)
-  - [ ] Brancher modifier/supprimer (`updateProject()`/`deleteProject()` + `refreshSegments()`)
-  - [ ] Styliser le panel (CSS)
-  - Effort restant estimé : ~30-40 min
+  - [x] `refreshSegments()` dans `wheel.js` (2026-07-06) — recharge `SEGMENTS` depuis localStorage + redessine roue/boutons/stats/liste
+  - [x] Panel HTML (2026-07-06) — bouton toggle `#btnManageProjects`, `#managePanel`, `#projectsList` + formulaire `#projectForm`
+  - [x] Lab 04 (2026-07-10) — `renderProjectsList()` affiche maintenant pastille de couleur + poids + boutons ✏️/🗑️ par projet (`data-id`, délégation d'événements sur `#projectsList`). Formulaire branché en mode double usage (ajout ou édition selon `editingProjectId`) — cliquer ✏️ pré-remplit le formulaire et change le libellé du bouton, bouton "Annuler" pour sortir du mode édition. Suppression avec `confirm()` natif (pas de modale custom dans ce projet). Chaque action (`addProject`/`updateProject`/`deleteProject`) suivie de `refreshSegments()` + `renderProjectsList()`.
+  - [x] Panel stylisé (CSS minimal ajouté dans `style.css` — cohérent avec le thème sombre magenta existant)
 
 - [ ] **Alerte hyperfocus**
   - Si un projet dépasse ~35% du temps semaine, signal visuel sur sa stat-card
@@ -76,8 +73,7 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh · Stat
 
 | Priorité | Item | Effort |
 |---|---|---|
-| 1 | CRUD projets UI | ~1h30 |
-| 2 | Alerte hyperfocus | ~30 min |
-| 3 | Anti-répétition signal | ~30 min |
-| 4 | Note/intention session | ~30 min |
-| 5 | Indicateur reset semaine | ~15 min |
+| 1 | Alerte hyperfocus | ~30 min |
+| 2 | Anti-répétition signal | ~30 min |
+| 3 | Note/intention session | ~30 min |
+| 4 | Indicateur reset semaine | ~15 min |
