@@ -17,6 +17,13 @@ let activeIndex   = -1;
 let wheelRotation = 0;
 let spinCandidates = null;
 
+// === EASTER EGG — clique 5x rapidement sur le centre de la roue ===
+let discoClickTimes  = [];
+let discoActive      = false;
+let discoFrame       = 0;
+let confettiParticles = [];
+const COULEURS_CONFETTI = ['#ff0090', '#00e5ff', '#ffd700', '#7fff00', '#ff4500', '#da70ff'];
+
 function drawWheel(fillRatio, activeColor, timeText = null, liveIndex = -1, liveMinutes = 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -52,13 +59,14 @@ function drawWheel(fillRatio, activeColor, timeText = null, liveIndex = -1, live
         ctx.fillStyle = '#0d0d0d';
         ctx.fill();
 
-        // Arc coloré
+        // Arc coloré (arc-en-ciel si le mode disco est actif)
+        const couleurArc = discoActive ? `hsl(${(discoFrame * 8 + i * 45) % 360}, 100%, 60%)` : seg.couleur;
         ctx.beginPath();
         ctx.arc(0, 0, RAYON, startAngle, endAngle);
-        ctx.shadowColor = seg.couleur;
-        ctx.shadowBlur  = i === activeIndex ? 25 : 10;
-        ctx.strokeStyle = seg.couleur;
-        ctx.lineWidth   = i === activeIndex ? 4 : 2;
+        ctx.shadowColor = couleurArc;
+        ctx.shadowBlur  = discoActive ? 30 : (i === activeIndex ? 25 : 10);
+        ctx.strokeStyle = couleurArc;
+        ctx.lineWidth   = discoActive ? 5 : (i === activeIndex ? 4 : 2);
         ctx.stroke();
         ctx.shadowBlur  = 0;
 
@@ -339,4 +347,95 @@ function celebrateSegment(index) {
         frame++;
         if (frame > 40) clearInterval(anim);
     }, 50);
+}
+
+// === EASTER EGG — détection du clic secret ===
+canvas.addEventListener('click', function(e) {
+    if (activeIndex !== -1) return; // pas pendant une session active, pour ne rien déranger
+
+    // Convertit la position du clic (pixels écran) en coordonnées du canvas
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top)  * scaleY;
+
+    if (Math.hypot(clickX - cx, clickY - cy) > 70) return; // faut cliquer DANS le cercle central
+
+    const now = Date.now();
+    discoClickTimes.push(now);
+    discoClickTimes = discoClickTimes.filter(t => now - t < 1200); // fenêtre de 1.2s
+
+    if (discoClickTimes.length >= 5) {
+        discoClickTimes = [];
+        triggerDisco();
+    }
+});
+
+function spawnConfetti() {
+    confettiParticles = [];
+    for (let i = 0; i < 100; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 6;
+        confettiParticles.push({
+            x: cx, y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 2,
+            couleur: COULEURS_CONFETTI[Math.floor(Math.random() * COULEURS_CONFETTI.length)],
+            taille: 3 + Math.random() * 4,
+            vie: 1
+        });
+    }
+}
+
+function triggerDisco() {
+    discoActive = true;
+    discoFrame  = 0;
+    spawnConfetti();
+
+    const anim = setInterval(function() {
+        drawWheel(null, null); // redessine la roue — le contour sortira en arc-en-ciel (discoActive = true)
+
+        // Physique des confettis : vitesse + gravité + décroissance de vie
+        confettiParticles.forEach(function(p) {
+            p.x  += p.vx;
+            p.y  += p.vy;
+            p.vy += 0.15;
+            p.vie -= 0.012;
+        });
+        confettiParticles = confettiParticles.filter(p => p.vie > 0);
+
+        confettiParticles.forEach(function(p) {
+            ctx.save();
+            ctx.globalAlpha = Math.max(p.vie, 0);
+            ctx.fillStyle   = p.couleur;
+            ctx.shadowColor = p.couleur;
+            ctx.shadowBlur  = 8;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.taille, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+
+        // Message caché — apparaît en fondu, reste un moment, disparaît en fondu
+        if (discoFrame > 5 && discoFrame < 90) {
+            const apparition = Math.min(1, (discoFrame - 5) / 15, (90 - discoFrame) / 15);
+            ctx.save();
+            ctx.globalAlpha  = Math.max(0, apparition);
+            ctx.font         = 'bold 22px Segoe UI, sans-serif';
+            ctx.textAlign    = 'center';
+            ctx.fillStyle    = '#fff';
+            ctx.shadowColor  = '#ff0090';
+            ctx.shadowBlur   = 20;
+            ctx.fillText('✨ Easter egg trouvé ! ✨', cx, cy - RAYON - 45);
+            ctx.restore();
+        }
+
+        discoFrame++;
+        if (discoFrame > 100 && confettiParticles.length === 0) {
+            discoActive = false;
+            clearInterval(anim);
+            drawWheel(null, null);
+        }
+    }, 30);
 }
