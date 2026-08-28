@@ -118,9 +118,10 @@ function recordTime(index, minutes) {
 
     // Nouvelle semaine → reset
     if (data.weekStart !== lundiStr) {
-        data.weekMinutes           = [0, 0, 0, 0, 0, 0, 0];
-        data.weekSessions          = [0, 0, 0, 0, 0, 0, 0];
-        data.weekCompletedSessions = [0, 0, 0, 0, 0, 0, 0];
+        const n = loadProjects().length;
+        data.weekMinutes           = new Array(n).fill(0);
+        data.weekSessions          = new Array(n).fill(0);
+        data.weekCompletedSessions = new Array(n).fill(0);
         data.weekStart             = lundiStr;
     }
 

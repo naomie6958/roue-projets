@@ -39,6 +39,7 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh (sessio
 - [x] **Spin parmi les non-travaillés** — lors du spin aléatoire, seuls les projets sans minutes cette semaine apparaissent et sont candidats; fallback logique pondérée si tous travaillés (2026-07-01)
 - [x] **Stats hebdomadaires sessions** — `weekSessions` + `weekCompletedSessions` dans storage, reset lundi avec weekMinutes; stats affichent les données de la semaine en mode "cette semaine" (2026-07-01)
 - [x] **Timer live dans le titre de l'onglet** (2026-07-06) — refactor des 3 `setInterval` dupliqués (`startTimer`/`resumeTimer`/`restoreTimer`) en une seule fonction partagée `tick(index, totalSecs)` dans `timer.js`, qui met à jour `document.title` chaque seconde (ex. "⏱ 0:17:57 · Roue de Projets"). Titre remis à la normale dans `onSessionEnd` et `stopTimer`. Overtime (`startOvertime`) a aussi son propre live update ("⏱ +1:23 · Roue de Projets"). Permet de voir le compte à rebours sans revenir sur l'onglet.
+- [x] **Seuil minimum de 5 min pour compter une session** (2026-07-10) — `stopTimer()` (normal + overtime) n'appelle plus `recordTime`/`recordSession` si l'arrêt manuel survient à moins de 5 min (`DUREE_MIN_SESSION`). Évite que les tests (démarrer/arrêter tout de suite) polluent les stats. N'affecte pas `onSessionEnd()` (session complétée au bout de la durée choisie, toujours comptée). Historique déjà loggé non corrigeable (aucun journal par session, seulement des compteurs cumulatifs).
 
 ---
 
@@ -54,8 +55,8 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh (sessio
   - [x] Lab 04 (2026-07-10) — `renderProjectsList()` affiche maintenant pastille de couleur + poids + boutons ✏️/🗑️ par projet (`data-id`, délégation d'événements sur `#projectsList`). Formulaire branché en mode double usage (ajout ou édition selon `editingProjectId`) — cliquer ✏️ pré-remplit le formulaire et change le libellé du bouton, bouton "Annuler" pour sortir du mode édition. Suppression avec `confirm()` natif (pas de modale custom dans ce projet). Chaque action (`addProject`/`updateProject`/`deleteProject`) suivie de `refreshSegments()` + `renderProjectsList()`.
   - [x] Panel stylisé (CSS minimal ajouté dans `style.css` — cohérent avec le thème sombre magenta existant)
 
-- [ ] **Alerte hyperfocus**
-  - Si un projet dépasse ~35% du temps semaine, signal visuel sur sa stat-card
+- [x] **Alerte hyperfocus** ✅ complété 2026-07-27
+  - Si un projet dépasse ~35% du temps semaine, signal visuel sur sa stat-card (bordure magenta + 🔥 sur `.stat-label`)
 
 - [ ] **Anti-répétition amélioré**
   - Signal si le même projet est sélectionné 2 jours de suite

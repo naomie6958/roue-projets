@@ -51,6 +51,7 @@ function onSessionEnd(index) {
     recordSession(index);
     recordCompletedSession(index);
     celebrateSegment(index);
+    feuArtifice(SEGMENTS[index].couleur);
     timerSection.style.display = 'none';
 
     const seg       = SEGMENTS[index];
@@ -121,6 +122,9 @@ function resumeTimer() {
     }, 1000);
 }
 
+// Sous ce seuil, on considère que c'est un test (démarré puis arrêté tout de suite) et non une vraie session
+const DUREE_MIN_SESSION = 5;
+
 function stopTimer() {
     document.title = 'Roue de Projets — TNTMom';
     if (isOvertime){
@@ -128,7 +132,7 @@ function stopTimer() {
         clearInterval(overtimeInterval);
         overtimeInterval = null;
         const overtimeMins = Math.round(overtimeSeconds / 60);
-        if (overtimeMins > 0 && currentIndex >= 0) {
+        if (overtimeMins >= DUREE_MIN_SESSION && currentIndex >= 0) {
             recordTime(currentIndex, overtimeMins);
         }
         isOvertime      = false;
@@ -138,7 +142,7 @@ function stopTimer() {
         clearInterval(timerInterval);
         timerInterval   = null;
         const elapsedMins = Math.round((chosenMinutes * 60 - timerSeconds) / 60);
-        if (elapsedMins > 0 && currentIndex >= 0) {
+        if (elapsedMins >= DUREE_MIN_SESSION && currentIndex >= 0) {
             recordTime(currentIndex, elapsedMins);
             recordSession(currentIndex);
         }

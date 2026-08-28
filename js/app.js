@@ -159,6 +159,8 @@ function renderStats() {
     const data = loadData();
     statsGrid.innerHTML = '';
 
+    const totalSemaine = data.weekMinutes.reduce((a, b) => a + b, 0);
+
     SEGMENTS.forEach(function(seg, i) {
         const mins   = statsMode === 'alltime' ? data.minutes[i] : data.weekMinutes[i];
         const label  = statsMode === 'alltime' ? 'total' : 'cette semaine';
@@ -174,6 +176,12 @@ function renderStats() {
 
         const div = document.createElement('div');
         div.className = 'stat-card';
+
+        const partSemaine = totalSemaine > 0 ? data.weekMinutes[i] / totalSemaine : 0;
+        if (partSemaine > 0.35) {
+            div.classList.add('stat-card--hyperfocus');
+        }
+
         div.innerHTML =
             '<span class="stat-label" style="color:' + seg.couleur + '">' + seg.label + '</span>' +
             '<span class="stat-count">' + total + ' session' + (total !== 1 ? 's' : '') + '</span>' +

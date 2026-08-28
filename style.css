@@ -40,6 +40,7 @@ h1 {
 /* ROUE */
 .wheel-section {
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: center;
 }
@@ -217,6 +218,15 @@ canvas:hover { filter: brightness(1.05); }
   background: #111;
   border-radius: 8px;
   border: 1px solid #1a1a1a;
+}
+
+.stat-card--hyperfocus {
+  border-color: #FF0090;
+  box-shadow: 0 0 8px rgba(255, 0, 144, 0.4);
+}
+
+.stat-card--hyperfocus .stat-label::after {
+  content: ' 🔥';
 }
 
 .btn-spin {
@@ -492,3 +502,14 @@ input[type="color"]:hover::-moz-color-swatch { border-color: #FF0090; }
 #projectForm button:hover { border-color: #FF0090; color: #fff; }
 
 .btn-copy-note.copied { border-color: #4caf50; color: #4caf50; }
+
+/* ==== Particules ==== */
+#particules {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
