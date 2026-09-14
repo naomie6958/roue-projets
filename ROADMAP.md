@@ -68,6 +68,11 @@ Roue visuelle · Timer liquide · Pause/Reprendre · Persistance refresh (sessio
 - [ ] **Indicateur reset de semaine**
   - Badge "Nouvelle semaine 🔄" quand weekMinutes reset le lundi
 
+- [ ] **Historique de sessions + tableau/graphique** (noté 2026-08-30, idée à scoper)
+  - Actuellement `storage.js` ne garde que des compteurs cumulatifs (`sessions`, `minutes`, `completedSessions`...), pas un journal par session — cas vécu le 2026-08-29 : impossible de retrouver ce qui avait été fait dans une session passée, seulement sa durée
+  - Pour un vrai tableau/graphique utile, il faudrait un nouveau modèle de données : un tableau `sessionsLog` avec un objet par session (`projectId`, `date`, `durée`, `complète oui/non`, peut-être une note optionnelle), puis une vue construite par-dessus (tableau triable et/ou graphique par jour/semaine/projet)
+  - Plus gros que les autres items ci-dessus (effort à définir, probablement plusieurs labs) — pas encore scopé en détail
+
 ---
 
 ## Ordre suggéré
